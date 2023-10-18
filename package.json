@@ -9,7 +9,9 @@
     "build": "tsc",
     "watch": "tsc -w",
     "test": "jest --passWithNoTests",
-    "cdk": "cdk"
+    "cdk": "cdk",
+    "deploy-pipeline": "cdk deploy ImageOptimizationPipeline",
+    "deploy-dev": "npm run build; cdk deploy Dev-ImageOptimization"
   },
   "devDependencies": {
     "@types/jest": "^29.5.3",

@@ -23,7 +23,7 @@ var S3_IMAGE_BUCKET_NAME: string;
 var CLOUDFRONT_ORIGIN_SHIELD_REGION = ORIGIN_SHIELD_MAPPING.get(process.env.AWS_REGION || process.env.CDK_DEFAULT_REGION || 'us-east-1');
 var CLOUDFRONT_CORS_ENABLED = 'true';
 // Parameters of transformed images
-var S3_TRANSFORMED_IMAGE_EXPIRATION_DURATION = '90';
+var S3_TRANSFORMED_IMAGE_EXPIRATION_DURATION = '360';
 var S3_TRANSFORMED_IMAGE_CACHE_TTL = 'max-age=31622400';
 // Lambda Parameters
 var LAMBDA_MEMORY = '1500';
@@ -46,15 +46,19 @@ type LambdaEnv = {
   logTiming: string,
 }
 
+export interface ImageOptimizationStackProps extends StackProps {
+  s3ImageBucketName: string
+}
+
 export class ImageOptimizationStack extends Stack {
-  constructor(scope: Construct, id: string, props?: StackProps) {
+  constructor(scope: Construct, id: string, props?: ImageOptimizationStackProps) {
     super(scope, id, props);
 
     // Change stack parameters based on provided context
     STORE_TRANSFORMED_IMAGES = this.node.tryGetContext('STORE_TRANSFORMED_IMAGES') || STORE_TRANSFORMED_IMAGES;
     S3_TRANSFORMED_IMAGE_EXPIRATION_DURATION = this.node.tryGetContext('S3_TRANSFORMED_IMAGE_EXPIRATION_DURATION') || S3_TRANSFORMED_IMAGE_EXPIRATION_DURATION;
     S3_TRANSFORMED_IMAGE_CACHE_TTL = this.node.tryGetContext('S3_TRANSFORMED_IMAGE_CACHE_TTL') || S3_TRANSFORMED_IMAGE_CACHE_TTL;
-    S3_IMAGE_BUCKET_NAME = this.node.tryGetContext('S3_IMAGE_BUCKET_NAME') || S3_IMAGE_BUCKET_NAME;
+    S3_IMAGE_BUCKET_NAME = props?.s3ImageBucketName || this.node.tryGetContext('S3_IMAGE_BUCKET_NAME') || S3_IMAGE_BUCKET_NAME;
     CLOUDFRONT_ORIGIN_SHIELD_REGION = this.node.tryGetContext('CLOUDFRONT_ORIGIN_SHIELD_REGION') || CLOUDFRONT_ORIGIN_SHIELD_REGION;
     CLOUDFRONT_CORS_ENABLED = this.node.tryGetContext('CLOUDFRONT_CORS_ENABLED') || CLOUDFRONT_CORS_ENABLED;
     LAMBDA_MEMORY = this.node.tryGetContext('LAMBDA_MEMORY') || LAMBDA_MEMORY;
